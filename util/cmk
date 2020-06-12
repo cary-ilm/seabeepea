@@ -9,6 +9,9 @@ ilm_prefix = "/dept/rnd/home/cary/"
 ilm_prefix = "/dept/rnd/home/cary/"
 ilm_build = "/dept/rnd/builds/cary"
 
+home_prefix = "/home/cary/"
+home_build = "/home/cary/builds"
+
 PYILMBASE_ENABLE = 0
 
 SRC_DIR = os.getcwd()
@@ -17,6 +20,7 @@ if SRC_DIR.startswith (lucas_ilm):
     SRC_DIR = SRC_DIR[len(lucas_ilm):]
 
 if SRC_DIR.startswith (ilm_prefix):
+
     project = SRC_DIR[len(ilm_prefix):]
     build = "%s/%s/cmake" % (ilm_build, project)
     if not path.exists (build):
@@ -24,6 +28,16 @@ if SRC_DIR.startswith (ilm_prefix):
 
     CXX = "/opt/rh/devtoolset-6/root/bin/g++"
     C = "/opt/rh/devtoolset-6/root/bin/gcc"
+
+elif SRC_DIR.startswith (home_prefix):
+
+    project = SRC_DIR[len(home_prefix):]
+    build = "%s/%s/cmake" % (home_build, project)
+    if not path.exists (build):
+        os.makedirs (build)
+
+    CXX = "g++"
+    C = "gcc"
 
 print build
 os.chdir (build)
