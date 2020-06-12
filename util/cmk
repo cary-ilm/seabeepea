@@ -12,7 +12,11 @@ ilm_build = "/dept/rnd/builds/cary"
 home_prefix = "/home/cary/"
 home_build = "/home/cary/builds"
 
+users_prefix = "/Users/cary/"
+users_build = "/Users/cary/builds"
+
 PYILMBASE_ENABLE = 0
+OPENEXR_VIEWERS_ENABLE = 0
 
 SRC_DIR = os.getcwd()
 
@@ -39,6 +43,16 @@ elif SRC_DIR.startswith (home_prefix):
     CXX = "g++"
     C = "gcc"
 
+elif SRC_DIR.startswith (users_prefix):
+
+    project = SRC_DIR[len(users_prefix):]
+    build = "%s/%s/cmake" % (users_build, project)
+    if not path.exists (build):
+        os.makedirs (build)
+
+    CXX = "g++"
+    C = "gcc"
+
 print build
 os.chdir (build)
 
@@ -53,6 +67,7 @@ if sys.argv[1] == "cmake":
     cmd += "-DCMAKE_CXX_COMPILER=%s " % CXX
     cmd += "-DCMAKE_C_COMPILER=%s " % C
     cmd += "-DPYILMBASE_ENABLE=%s " % PYILMBASE_ENABLE
+    cmd += "-DOPENEXR_VIEWERS_ENABLE=%s" % OPENEXR_VIEWERS_ENABLE
 
     print cmd
     os.system (cmd)
