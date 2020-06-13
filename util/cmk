@@ -57,12 +57,12 @@ print build
 os.chdir (build)
 
 if len (sys.argv) == 1:
-    os.exit(0)
-
+    exit(0)
+    
 if sys.argv[1] == "cmake":
 
     cmd = "cmake %s " % SRC_DIR
-    cmd += "-DCMAKE_INSTALL_PREFIX=%s " % build
+    cmd += "-DCMAKE_INSTALL_PREFIX=%s/install " % build
     cmd += "-DCMAKE_SYSTEM_PREFIX=%s " % build
     cmd += "-DCMAKE_CXX_COMPILER=%s " % CXX
     cmd += "-DCMAKE_C_COMPILER=%s " % C
@@ -72,8 +72,15 @@ if sys.argv[1] == "cmake":
     print cmd
     os.system (cmd)
 
+elif sys.argv[1] == "clobber":
+
+    cmd = "rm -rf %s" % build
+    print cmd
+    os.system (cmd)
+    
 else:
+
     cmd = " ".join(sys.argv[1:])
-    print "cmd: %s" % cmd
+    print cmd
     os.system (cmd)
         
