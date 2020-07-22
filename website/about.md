@@ -1,6 +1,6 @@
 # About OpenEXR
 
-# High Dynamic Range Imagery
+## High Dynamic Range Imagery
 
 The following pictures show the same OpenEXR image, yet the amount of
 detail you can see when comparing the three is substantially
@@ -100,7 +100,7 @@ part is independent of the others.
 
 Please see the technical documentation for further detail.
 
-### About the OpenEXR Project
+## About the OpenEXR Project
 
 OpenEXR is a project of the [Academy Software
 Foundation](https://www.aswf.io).  The format and library were
