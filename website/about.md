@@ -1,21 +1,19 @@
 # About OpenEXR
 
-The following pictures show the same OpenEXR image; yet the amount of
+The following pictures show the same OpenEXR image, yet the amount of
 detail you can see when comparing the three is substantially
 different. The view out the window is obscured by the bright sunlight,
 although there is, in fact, a building next door with a rust-colored
 roof; the sky is blue, and there are even power lines visible above
-the building. Using the Viewer, you can adjust the amount of exposure
-on the fly to see more details emerge, as the following images show.
- 
-Original OpenEXR Image
+the building.
 
-... with original Exposure setting of zero (0):	Adjust 4 Stops Darker
+[<img src="https://www.openexr.com/images/sample3_01_sm.jpg">](https://www.openexr.com/images/sample3_01.jpg)
+[<img src="https://www.openexr.com/images/sample3_02_sm.jpg">](https://www.openexr.com/images/sample3_02.jpg)
+[<img src="https://www.openexr.com/images/sample3_03_sm.jpg">](https://www.openexr.com/images/sample3_03.jpg)
+	  
+The image on the left shows an exposure setting of 0. The middle image displays the image 4 stops darker; details emerge from the glaring sunlight. The image on the right is 8 stops darker; even more details emerge from outside the window. 
 
-... details emerge from the glaring sunlight.	Adjust 8 Stops Darker
-
-... and even more details emerge from the outside.
-		
+With exrdisplay, however, changing the exposure does not affect image data itself, it simply changes the way that the original 16-bit floating-point pixel values in the image are converted to 8-bit integer data in the frame buffer. We call the original 16-bit FP pixels the "raw" image data, and the converted 8-bit pixels the "cooked" image data. When you change the exposure, you are "re-cooking" the data.
 
 ## History
 
