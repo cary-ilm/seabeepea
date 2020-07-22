@@ -125,7 +125,7 @@ This is a patch release of OpenEXR v2.2 that includes fixes for the following se
 
 See the CHANGES.md for more details.
 
-# Feb 11, 2020 - OpenEXR version v2.4.1 is released.
+## Feb 11, 2020 - OpenEXR version v2.4.1 is released.
 
 Available for download at
 https://github.com/AcademySoftwareFoundation/openexr/releases/tag/v2.4.1
@@ -184,7 +184,7 @@ Summary of changes:
   * CVE-2018-18443 Issue #350 heap-buffer-overflow
 
 
-# Sep 5, 2019 - OpenEXR version v2.4.0-beta.1 is released
+## Sep 5, 2019 - OpenEXR version v2.4.0-beta.1 is released
 
 Available for download at
 https://github.com/AcademySoftwareFoundation/openexr/releases/tag/v2.4.0-beta.1
@@ -283,7 +283,7 @@ OpenEXR source can be obtained from the downloads section of
 www.openexr.com or from the project page on github:
 https://github.com/AcademySoftwareFoundation/openexr
 
-# August 10, 2014 - OpenEXR v2.2.0 has been released.
+## August 10, 2014 - OpenEXR v2.2.0 has been released.
 
 This release includes the following components:
 
@@ -316,7 +316,7 @@ OpenEXR source can be obtained from the downloads section of
 www.openexr.com or from the project page on github:
 https://github.com/AcademySoftwareFoundation/openexr
 
-# November 25, 2013 - OpenEXR v2.1.0 has been released.
+## November 25, 2013 - OpenEXR v2.1.0 has been released.
 
 This release includes the following components (version locked):
 
@@ -333,7 +333,7 @@ RGBA data, optimisations for some of the python bindings to Imath,
 improvements to the cmake build environment as well as additional
 documentation describing deep data in more detail.
 
-# April 9, 2013 - Industrial Light & Magic (ILM) and Weta Digital announce the release of OpenEXR 2.0.
+## April 9, 2013 - Industrial Light & Magic (ILM) and Weta Digital announce the release of OpenEXR 2.0.
 
 This is a major version update of the open source high dynamic range
 file format first introduced by ILM and maintained and expanded by a
@@ -424,7 +424,7 @@ that depth data can also be assigned to two-dimensional data for a use
 in many design fields including, architecture, graphic design,
 automotive and product prototyping.
 
-# July 31st, 2012 - OpenEXR v1.7.1 has been released.
+## July 31st, 2012 - OpenEXR v1.7.1 has been released.
 
 This release includes the following components:
 
@@ -569,7 +569,7 @@ from http://ampasctl.sourceforge.net. Please note the license under
 which CTL is distributed; it is similar but not identical to the
 OpenEXR license.
 
-# January 4, 2007 - OpenEXR wins an Academy Award for Technical Achievement.
+## January 4, 2007 - OpenEXR wins an Academy Award for Technical Achievement.
 
 The Academy of Motion Picture Arts and Sciences today announced the 15
 winners of Scientific and Technical Academy Awards. A Technical
@@ -739,7 +739,7 @@ changes:
 
 * Warning cleanups in Visual C++.
 
-# May 11, 2004 - OpenEXR 1.2.0 is now available.
+## May 11, 2004 - OpenEXR 1.2.0 is now available.
 
 This is the first official, production-ready release since OpenEXR
 1.0.7. If you have been using the development 1.1 series, please
@@ -776,7 +776,7 @@ original 1.0 series:
 
 See the downloads section to download the source code and sample images.
 
-# Mar 27, 2004 - OpenEXR 1.1.1 is now available.
+## Mar 27, 2004 - OpenEXR 1.1.1 is now available.
 
 This another development release. We expect to release a stable
 version, 1.2, around the end of April. Version 1.1.1 includes support
@@ -804,13 +804,13 @@ these features, and updated the CodeWarrior project and Photoshop
 plugins for this release. See the downloads section for the source
 code and the new images.
 
-# Jan 8, 2004 - Industrial Light & Magic has released the source code
+## Jan 8, 2004 - Industrial Light & Magic has released the source code
   for an OpenEXR Shake plugin.
 
 The plugin is supported on Shake 3.0 on the GNU/Linux and MacOS X
 platforms. See the downloads section.
 
-# Jan 7, 2004 - OpenEXR 1.0.7 is now available.
+## Jan 7, 2004 - OpenEXR 1.0.7 is now available.
 
 In addition to some bug fixes, this version adds support for some new
 standard attributes, such as primary and white point chromaticities,

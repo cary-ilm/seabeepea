@@ -6,7 +6,7 @@ motion picture industry.
 
 Table of Contents:
 
-* [News](news.md)
+* [About](about.md)
 
 * [Download](download.md)
 
@@ -16,17 +16,19 @@ Table of Contents:
 
 * [Security](security.md)
 
-* [About](about.md)
+* [News](news.md)
+
+* [Help](help.md)
 
 ## News
 
-* OpenEXR version v2.5.2 is released (June 15, 2020)
+* [OpenEXR version v2.5.2 is released (June 15, 2020)](news.md#june-15-2020---openexr-version-v252-is-released)
 
-* OpenEXR version v2.4.2 is released (June 15, 2020)
+* [OpenEXR version v2.4.2 is released (June 15, 2020)](news.md#june-15-2020---openexr-version-v242-is-released)
 
-* OpenEXR version v2.5.1 is released (May 11, 2020)
+* [OpenEXR version v2.5.1 is released (May 11, 2020)](news.md#may-11-2020---openexr-version-v251-is-released)
 
-* OpenEXR version v2.5.0 is released (May 6, 2020)
+* [OpenEXR version v2.5.0 is released (May 6, 2020)](https://github.com/cary-ilm/seabeepea/blob/master/website/news.md#may-6-2020---openexr-version-v250-is-released)
 
 ## Download
 
@@ -47,6 +49,9 @@ with strong support for multi-part, multi-channel use cases.
 OpenEXR is widely used in host application software where accuracy is
 critical, such as photorealistic rendering, texture access, image
 compositing, deep compositing, and DI.
+
+OpenEXR is included in the [VFX Reference
+Platform](https://vfxplatform.com).
 
 ### OpenEXR Features
 
@@ -75,7 +80,7 @@ compositing, deep compositing, and DI.
   namespaces to provide protection when using multiple versions of the
   library in the same process space.
 
-### OpenEXR Project Mission
+### The OpenEXR Project Mission
 
 The goal of the OpenEXR project is to keep the EXR format reliable and
 modern and to maintain its place as the preferred image format for
@@ -99,52 +104,6 @@ The goals of the IlmBase project are simplicity, ease of use,
 correctness and verifiability, and breadth of adoption. IlmBase is not
 intended to be a comprehensive linear algebra or numerical analysis
 package.
-
-### About OpenEXR
-
-OpenEXR is a project of the [Academy Software
-Foundation](https://www.aswf.io).  The format and library were
-originally developed by Industrial Light & Magic and first released
-in 2003.  Weta Digital, Walt Disney Animation Studios, Sony Pictures
-Imageworks, Pixar Animation Studios, DreamWorks, and other studios,
-companies, and individuals have made contributions to the code base.
-
-OpenEXR is included in the [VFX Reference
-Platform](https://vfxplatform.com).
-
-### OpenEXR Project Governance
-
-OpenEXR is hosted by the Academy Software Foundation. See
-[GOVERNANCE](GOVERNANCE.md) for more information about how the project
-operates.
-
-The OpenEXR project is dedicated to promoting a harassment-free
-community. Read our [code of conduct](CODE_OF_CONDUCT.md).
-
-## Developer Quick Start
-
-See [INSTALL](INSTALL.md) for instructions on downloading and building OpenEXR
-from source.
-
-### Getting Help
-
-There are two primary ways to connect with the OpenEXR project:
-
-* The openexr-dev@lists.aswf.io mail list: This is a development
-  focused mail list with a deep history of technical conversations and
-  decisions that have shaped the project. Subscribe at
-  [openexr-dev@lists.aswf.io](https://lists.aswf.io/g/openexr-dev).
-
-* GitHub Issues: GitHub issues are used both to track bugs and to
-  discuss feature requests.
-
-See [CONTRIBUTING](CONTRIBUTING.md) for more information.
-
-### Getting Involved
-
-OpenEXR welcomes contributions to the project. See
-[CONTRIBUTING](CONTRIBUTING.md) for more information about
-contributing to OpenEXR.
 
 ## License
 
