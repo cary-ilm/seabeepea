@@ -14,25 +14,25 @@ the building.
 [<img src="https://www.openexr.com/images/sample3_03_sm.jpg">](https://www.openexr.com/images/sample3_03.jpg)
 	  
 The image on the left shows an exposure setting of 0. The middle image
-displays the image 4 stops darker; details emerge from the glaring
-sunlight. The image on the right is 8 stops darker; even more details
-emerge from outside the window.
+displays the image 4 stops darker, revealing details from the glaring
+sunlight. The image on the right is 8 stops darker, and even more
+details emerge from outside the window.
 
-With a program like Photoshop that is capable of working with or
-display high dynamic range images, changing the exposure does not
-affect image data itself, it simply changes the way that the original
-16-bit floating-point pixel values in the image are converted to 8-bit
-integer data in the frame buffer. We call the original 16-bit FP
-pixels the "raw" image data, and the converted 8-bit pixels the
-"cooked" image data. When you change the exposure, you are
-"re-cooking" the data.
+With a program like Photoshop that is capable of working with and
+displaying high dynamic range images, changing the exposure does not
+affect the image data itself, it simply changes the way that the
+original 16-bit floating-point pixel values in the image are converted
+to 8-bit integer data in the frame buffer of the display device. We
+call the original 16-bit pixels the "raw" image data, and the
+converted 8-bit pixels the "cooked" image data. When you change the
+exposure, you are "re-cooking" the data.
 
 ## History of OpenEXR
 
-ILM developed the OpenEXR format in response to the demand for higher
-color fidelity in the visual effects industry. When the project began
-in 2000, ILM evaluated existing file formats, but rejected them for
-various reasons:
+Industrial Light & Magic developed the OpenEXR format in response to
+the demand for higher color fidelity in the visual effects
+industry. When the project began in 2000, ILM evaluated existing file
+formats, but rejected them for various reasons:
 
 * 8- and 10-bit formats lack the dynamic range necessary to store
   high-contrast images captured from HDR devices.
@@ -49,7 +49,7 @@ various reasons:
   example.
 
 * Conversely, 32-bit floating-point TIFF is often overkill for visual
-  effects work. 32-bit FP TIFF provides more than sufficient precision
+  effects work. 32-bit TIFF provides more than sufficient precision
   and dynamic range for VFX images, but it comes at the cost of
   storage, both on disk and in memory. Motion picture images are
   typically 2k or 4k resolution or larger.
@@ -58,7 +58,7 @@ various reasons:
 
 In 2000, ILM decided to develop a new HDR file format with color
 component values stored in a new 16-bit floating-point type called
-"half." This type is compatible with the IEEE-754-2008 standard,
+"half." This type is now compatible with the IEEE-754-2008 standard,
 although note that this standard was not adopted until 2008, several
 years after the develoment on OpenEXR.
 
@@ -100,6 +100,17 @@ part is independent of the others.
 
 Please see the technical documentation for further detail.
 
+## Imath
+
+The half type is now distributed as a part of the Imath library, along
+with other C++ classes that represent 2D and 3D vectors and matrices
+and other simple but useful mathematical objects, functions, and data
+types common in computer graphics applications. These classes were
+originally distributed as the IlmBase library as a component of
+OpenEXR, but as of the the 3.0 release of OpenEXR in late 2020, Imath
+is now distributed independently of OpenEXR, although it continues to
+be maintained by the OpenEXR project.
+
 ## About the OpenEXR Project
 
 OpenEXR is a project of the [Academy Software
@@ -115,6 +126,11 @@ for more information about how the project operates.
 
 The OpenEXR project is dedicated to promoting a harassment-free
 community. Read our [code of conduct](CODE_OF_CONDUCT.md).
+
+## Contributing to OpenEXR
+
+For information on contributing to OpenEXR, see the CONTRIBUTING page
+in the GitHub repo.
 
 ## Contributors
 

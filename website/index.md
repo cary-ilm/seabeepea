@@ -36,13 +36,15 @@ The latest stable release is OpenEXR v2.5.2. Download it here:
 [v2.5.2.tar.gz](https://github.com/AcademySoftwareFoundation/openexr/archive/v2.5.2.tar.gz)
 
 Download the most recent unstable development version from the GitHub
-repo here: https://github.com/AcademySoftwareFoundation/openexr.
+repo:
+
+    git clone https://github.com/AcademySoftwareFoundation/openexr
 
 See the [download](download.md) page for help building from source.
 
-## Overview
+## The OpenEXR File Format
 
-The purpose of the EXR format is to accurately and efficiently represent
+The purpose of the OpenEXR format is to accurately and efficiently represent
 high-dynamic-range scene-linear image data and associated metadata,
 with strong support for multi-part, multi-channel use cases.
 
@@ -50,32 +52,42 @@ OpenEXR is widely used in host application software where accuracy is
 critical, such as photorealistic rendering, texture access, image
 compositing, deep compositing, and DI.
 
+OpenEXR is a project of the [Academy Software
+Foundation](https://www.aswf.io).
+
 OpenEXR is included in the [VFX Reference
 Platform](https://vfxplatform.com).
 
 ### OpenEXR Features
 
 * High dynamic range and color precision.
+
 * Support for 16-bit floating-point, 32-bit floating-point, and
   32-bit integer pixels.
+
 * Multiple image compression algorithms, both lossless and lossy. Some of
   the included codecs can achieve 2:1 lossless compression ratios on images
   with film grain.  The lossy codecs have been tuned for visual quality and
   decoding performance.
+
 * Extensibility. New compression codecs and image types can easily be added
   by extending the C++ classes included in the OpenEXR software distribution.
   New image attributes (strings, vectors, integers, etc.) can be added to
   OpenEXR image headers without affecting backward compatibility with
   existing OpenEXR applications. 
+
 * Support for stereoscopic image workflows and a generalization
   to multi-views.
+
 * Flexible support for deep data: pixels can store a variable-length list
   of samples and, thus, it is possible to store multiple values at different
   depths for each pixel. Hard surfaces and volumetric data representations
   are accommodated.
+
 * Multipart: ability to encode separate, but related, images in one file.
   This allows for access to individual parts without the need to read other
   parts in the file.
+
 * Versioning: OpenEXR source allows for user configurable C++
   namespaces to provide protection when using multiple versions of the
   library in the same process space.
@@ -91,9 +103,13 @@ weighed against increased complexity.  The principal priorities of the
 project are:
 
 * Robustness, reliability, security
+
 * Backwards compatibility, data longevity
+
 * Performance - read/write/compression/decompression time
+
 * Simplicity, ease of use, maintainability
+
 * Wide adoption, multi-platform support - Linux, Windows, macOS, and others
 
 OpenEXR is intended solely for 2D data. It is not appropriate for
