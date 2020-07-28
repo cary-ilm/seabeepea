@@ -16,12 +16,10 @@ AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-# AllowShortLambdasOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: TopLevel
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: MultiLine
-#AlwaysBreakTemplateDeclarations: No
 BinPackArguments: false
 BinPackParameters: false
 BraceWrapping:   
@@ -41,16 +39,15 @@ BraceWrapping:
   SplitEmptyFunction: false
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
-BreakBeforeBinaryOperators: None
+BreakBeforeBinaryOperators: All
 BreakBeforeBraces: Custom
 BreakBeforeInheritanceComma: false
 BreakInheritanceList: BeforeColon
 BreakBeforeTernaryOperators: true
-BreakConstructorInitializersBeforeComma: true
-BreakConstructorInitializers: BeforeComma
+BreakConstructorInitializers: BeforeColon
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: false
-ColumnLimit:     100
+ColumnLimit:     80
 CommentPragmas:  '^ IWYU pragma:'
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
@@ -118,7 +115,6 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SpacesInConditionalStatement: false
 Standard:        Cpp11
-TabWidth:        8
-#UseTab:          ForIndentation
+TabWidth:        4
 UseTab:          Never
 ...
