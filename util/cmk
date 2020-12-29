@@ -27,12 +27,16 @@ sanitize = None
 
 CMAKE_VERBOSE_MAKEFILE = 1
 CMAKE_BUILD_TYPE = "debug"
+CMAKE_BUILD_TYPE = "release"
 
 def branch():
     on_branch = "On branch "
     head_detached_at = "HEAD detached at "
     f = os.popen ("git status")
-    b = f.readlines()[0][:-1]
+    lines = f.readlines()
+    if len(lines) == 0:
+        return "."
+    b = lines[0][:-1]
     if b.startswith (on_branch):
         b = b[len (on_branch):]
     elif b.startswith (head_detached_at):
