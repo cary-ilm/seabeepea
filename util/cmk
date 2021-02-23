@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import sys
 import os
@@ -15,18 +15,19 @@ home_build = "/home/cary/builds"
 users_prefix = "/Users/cary/"
 users_build = "/Users/cary/builds"
 
-PYILMBASE_ENABLE = 0
+PYTHON_ENABLE = 0
+PYIMATH_ENABLE_EXCEPTIONS=1
 OPENEXR_VIEWERS_ENABLE = 0
 BUILD_TESTING = 1
 OPENEXR_RUN_FUZZ_TESTS = 1
 
-CXX_FLAGS = ""
+CXX_FLAGS = "-g"
 C_FLAGS = ""
 
 sanitize = None
 
 CMAKE_VERBOSE_MAKEFILE = 1
-CMAKE_BUILD_TYPE = "debug"
+#CMAKE_BUILD_TYPE = "debug"
 CMAKE_BUILD_TYPE = "release"
 
 def branch():
@@ -42,8 +43,8 @@ def branch():
     elif b.startswith (head_detached_at):
         b = b[len (head_detached_at):]
     else:
-        b = "."
-    return b
+        b = ""
+    return "/" + b
 
 def run_cmake():
     args = " ".join (sys.argv[2:])
@@ -54,8 +55,7 @@ def run_cmake():
     cmd += " -DCMAKE_C_COMPILER=%s " % C
     cmd += " -DCMAKE_CXX_FLAGS=\"%s\"" % CXX_FLAGS
     cmd += " -DCMAKE_C_FLAGS=\"%s\"" % C_FLAGS
-    cmd += " -DPYILMBASE_ENABLE=%s " % PYILMBASE_ENABLE
-    cmd += " -DOPENEXR_VIEWERS_ENABLE=%s" % OPENEXR_VIEWERS_ENABLE
+    cmd += " -DPYTHON=%s " % PYTHON_ENABLE
     cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
     cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
     cmd += " -DCMAKE_VERBOSE_MAKEFILE=%s" % CMAKE_VERBOSE_MAKEFILE
@@ -72,7 +72,7 @@ if SRC_DIR.startswith (lucas_ilm):
 if SRC_DIR.startswith (ilm_prefix):
 
     project = SRC_DIR[len(ilm_prefix):]
-    build = "%s/%s/%s" % (ilm_build, project, branch())
+    build = "%s/%s%s" % (ilm_build, project, branch())
     if not path.exists (build):
         os.makedirs (build)
 
@@ -82,7 +82,7 @@ if SRC_DIR.startswith (ilm_prefix):
 elif SRC_DIR.startswith (home_prefix):
 
     project = SRC_DIR[len(home_prefix):]
-    build = "%s/%s/%s" % (home_build, project, branch())
+    build = "%s/%s%s" % (home_build, project, branch())
     if not path.exists (build):
         os.makedirs (build)
 
@@ -93,11 +93,12 @@ elif SRC_DIR.startswith (home_prefix):
     C = "clang"
 
     CXX_FLAGS += " -std=c++14"
+#    CXX_FLAGS += " -std=c++11"
     
 elif SRC_DIR.startswith (users_prefix):
 
     project = SRC_DIR[len(users_prefix):]
-    build = "%s/%s/%s" % (users_build, project, branch())
+    build = "%s/%s%s" % (users_build, project, branch())
     if not path.exists (build):
         os.makedirs (build)
 
@@ -112,6 +113,10 @@ if len (sys.argv) == 1:
     
 if sys.argv[1] == "cmake":
 
+    if len (sys.argv) > 2 and sys.argv[2] == "python":
+        sys.argv = sys.argv[0:1]
+        PYTHON_ENABLE = 1
+        
     run_cmake()
 
 elif sys.argv[1] == "sanitize":
