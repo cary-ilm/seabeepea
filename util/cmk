@@ -16,6 +16,7 @@ users_prefix = "/Users/cary/"
 users_build = "/Users/cary/builds"
 
 PYTHON_ENABLE = 0
+USE_PYTHON2 = 0
 PYIMATH_ENABLE_EXCEPTIONS=1
 OPENEXR_VIEWERS_ENABLE = 0
 BUILD_TESTING = 1
@@ -56,6 +57,7 @@ def run_cmake():
     cmd += " -DCMAKE_CXX_FLAGS=\"%s\"" % CXX_FLAGS
     cmd += " -DCMAKE_C_FLAGS=\"%s\"" % C_FLAGS
     cmd += " -DPYTHON=%s " % PYTHON_ENABLE
+    cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
     cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
     cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
     cmd += " -DCMAKE_VERBOSE_MAKEFILE=%s" % CMAKE_VERBOSE_MAKEFILE
@@ -104,6 +106,9 @@ elif SRC_DIR.startswith (users_prefix):
 
     CXX = "g++"
     C = "gcc"
+else:
+
+    print "where are you?"
 
 print build
 os.chdir (build)
@@ -116,6 +121,11 @@ if sys.argv[1] == "cmake":
     if len (sys.argv) > 2 and sys.argv[2] == "python":
         sys.argv = sys.argv[0:1]
         PYTHON_ENABLE = 1
+        
+    if len (sys.argv) > 2 and sys.argv[2] == "python2":
+        sys.argv = sys.argv[0:1]
+        PYTHON_ENABLE = 1
+        USE_PYTHON2 = 1
         
     run_cmake()
 
