@@ -56,7 +56,6 @@ def branch():
         b = ""
     return "/" + b
 
-
 args = []
 cmd = None
 
@@ -101,7 +100,10 @@ for arg in sys.argv[1:]:
 SRC_DIR = os.getcwd()
 
 if SRC_DIR.startswith (lucas_ilm):
+
     SRC_DIR = SRC_DIR[len(lucas_ilm):]
+
+print("SRC_DIR=%s" % SRC_DIR)
 
 if SRC_DIR.startswith (ilm_prefix):
 
@@ -134,10 +136,17 @@ elif SRC_DIR.startswith (users_prefix):
     CXX = "g++"
     C = "gcc"
 
+else:
+
+    print("where are you?")
+
 print(build)
 os.chdir (build)
 
-if cmd == "cmake":
+if len (sys.argv) == 1:
+    exit(0)
+    
+if sys.argv[1] == "cmake":
 
     args = " ".join (args)
     cmd = "%s %s %s" % (cmake_bin, SRC_DIR, args)
