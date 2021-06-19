@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # cmk cmake clobber debug python sanitize -examples -utils -testing 
 
 import sys
 import os
-from os import path
+import glob
 
 CMAKE_VERSION = "3.11.4"
 CMAKE_VERSION = "3.10.3"
@@ -33,12 +33,14 @@ OPENEXR_RUN_FUZZ_TESTS = 0
 CMAKE_VERBOSE_MAKEFILE = 1
 CMAKE_BUILD_TYPE = "Release"
 
-CXX = "g++"
-C = "gcc"
-CXX_FLAGS = "-g"
-C_FLAGS = ""
-
+CMAKE_CXX_COMPILER = "g++"
+CMAKE_CXX_FLAGS = "-g"
 CMAKE_CXX_STANDARD = 14
+CMAKE_CXX_OUTPUT_EXTENSION_REPLACE = 0
+CMAKE_EXE_LINKER_FLAGS = ""
+CMAKE_C_COMPILER = "gcc"
+CMAKE_C_FLAGS = ""
+
 
 def branch():
     on_branch = "On branch "
@@ -55,6 +57,17 @@ def branch():
     else:
         b = ""
     return "/" + b
+
+def coverage():
+
+    files = glob.glob ("**/*.cpp", recursive=True)
+    for file in files:
+        print("file=%s" % file)
+        
+#for g in $(find ../_build -name "*.gcno" -type f); do
+#    gcov -l -p -o $(dirname "$g") $(echo "$g" | sed -e 's/\/_build\//\//' -e 's/\.gcno/\.cpp/' -e 's/\/CMakeFiles.*\.dir\//\//')
+#done
+    
 
 args = []
 cmd = None
@@ -79,8 +92,8 @@ for arg in sys.argv[1:]:
         sanitize = "address"
         sanitize = "undefined"
         sanitize = "undefined,address"
-        CXX_FLAGS += " -fsanitize=%s " % sanitize
-        C_FLAGS += " -fsanitize=%s " % sanitize
+        CMAKE_CXX_FLAGS += " -fsanitize=%s " % sanitize
+        CMAKE_C_FLAGS += " -fsanitize=%s " % sanitize
     elif arg == "-shared" or arg == "static":
         BUILD_SHARED_LIBS = 0
     elif arg == "-examples":
@@ -92,8 +105,14 @@ for arg in sys.argv[1:]:
     elif arg == "11":
         CMAKE_CXX_STANDARD = 11
     elif arg == "clang":
-        CXX = "clang++"
-        C = "clang"
+        CMAKE_CXX_COMPILER = "clang++"
+        CMAKE_C_COMPILER = "clang"
+    elif arg == "gcov":
+        CMAKE_CXX_FLAGS += "-g -O0 -fprofile-arcs -ftest-coverage"
+        CMAKE_CXX_OUTPUT_EXTENSION_REPLACE = 1
+        CMAKE_EXE_LINKER_FLAGS = "-lgcov"
+    elif arg == "coverage":
+        cmd = arg
     else:
         args.append (arg)
         
@@ -103,19 +122,17 @@ if SRC_DIR.startswith (lucas_ilm):
 
     SRC_DIR = SRC_DIR[len(lucas_ilm):]
 
-print("SRC_DIR=%s" % SRC_DIR)
-
 if SRC_DIR.startswith (ilm_prefix):
 
     project = SRC_DIR[len(ilm_prefix):]
     build = "%s/%s%s" % (ilm_build, project, branch())
     if BUILD_SHARED_LIBS == 0:
         build += "-static"
-    if not path.exists (build):
+    if not os.path.exists (build):
         os.makedirs (build)
 
-    CXX = "/opt/rh/devtoolset-6/root/bin/g++"
-    C = "/opt/rh/devtoolset-6/root/bin/gcc"
+    CMAKE_CXX_COMPILER = "/opt/rh/devtoolset-6/root/bin/g++"
+    CMAKE_C_COMPILER = "/opt/rh/devtoolset-6/root/bin/gcc"
 
 elif SRC_DIR.startswith (home_prefix):
 
@@ -123,18 +140,21 @@ elif SRC_DIR.startswith (home_prefix):
     build = "%s/%s%s-%s" % (home_build, project, branch(), CMAKE_BUILD_TYPE)
     if BUILD_SHARED_LIBS == 0:
         build += "-static"
-    if not path.exists (build):
+    if not os.path.exists (build):
         os.makedirs (build)
 
 elif SRC_DIR.startswith (users_prefix):
 
     project = SRC_DIR[len(users_prefix):]
-    build = "%s/%s%s" % (users_build, project, branch())
-    if not path.exists (build):
+    build = "%s/%s%s-%s" % (users_build, project, branch(), CMAKE_BUILD_TYPE)
+    if BUILD_SHARED_LIBS == 0:
+        build += "-static"
+    if not os.path.exists (build):
         os.makedirs (build)
 
-    CXX = "g++"
-    C = "gcc"
+    cmake_bin = "cmake"
+    CMAKE_CXX_COMPILER = "g++"
+    CMAKE_C_COMPILER = "gcc"
 
 else:
 
@@ -146,7 +166,7 @@ os.chdir (build)
 if len (sys.argv) == 1:
     exit(0)
     
-if sys.argv[1] == "cmake":
+if cmd == "cmake":
 
     args = " ".join (args)
     cmd = "%s %s %s" % (cmake_bin, SRC_DIR, args)
@@ -155,17 +175,19 @@ if sys.argv[1] == "cmake":
     cmd += " -DBUILD_SHARED_LIBS=%s" % BUILD_SHARED_LIBS
     cmd += " -DCMAKE_VERBOSE_MAKEFILE=%s" % CMAKE_VERBOSE_MAKEFILE
     cmd += " -DCMAKE_CXX_STANDARD=%s " % CMAKE_CXX_STANDARD
-    cmd += " -DCMAKE_CXX_COMPILER=%s " % CXX
-    cmd += " -DCMAKE_C_COMPILER=%s " % C
-    cmd += " -DCMAKE_CXX_FLAGS=\"%s\"" % CXX_FLAGS
-    cmd += " -DCMAKE_C_FLAGS=\"%s\"" % C_FLAGS
+    cmd += " -DCMAKE_CXX_COMPILER=%s " % CMAKE_CXX_COMPILER
+    cmd += " -DCMAKE_CXX_FLAGS=\"%s\"" % CMAKE_CXX_FLAGS
+    cmd += " -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=%s" % CMAKE_CXX_OUTPUT_EXTENSION_REPLACE
+    cmd += " -DCMAKE_C_COMPILER=%s " % CMAKE_C_COMPILER
+    cmd += " -DCMAKE_C_FLAGS=\"%s\"" % CMAKE_C_FLAGS
+    cmd += " -DCMAKE_EXE_LINKER_FLAGS=%s" % CMAKE_EXE_LINKER_FLAGS
     cmd += " -DPYTHON=%s " % PYTHON
     cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
     cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
     cmd += " -DOPENEXR_BUILD_UTILS=%s" % OPENEXR_BUILD_UTILS
     cmd += " -DOPENEXR_INSTALL_EXAMPLES=%s" % OPENEXR_INSTALL_EXAMPLES
     cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
-    
+
     print(cmd)
     os.system (cmd)
 
@@ -175,6 +197,10 @@ elif cmd == "clobber":
     print(cmd)
     os.system (cmd)
 
+elif cmd == "coverage":
+
+    coverage()
+    
 elif len(args) > 0:
 
     cmd = " ".join(args)
