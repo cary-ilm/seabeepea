@@ -1,8 +1,16 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
+
+# cmk cmake clobber debug python sanitize -examples -utils -testing 
 
 import sys
 import os
 from os import path
+
+CMAKE_VERSION = "3.11.4"
+CMAKE_VERSION = "3.10.3"
+
+cmake_bin = "/home/cary/src/cmake/%s/bin/cmake" % CMAKE_VERSION
+cmake_bin = "/usr/bin/cmake"
 
 lucas_ilm = "/lucas/ilm"
 ilm_prefix = "/dept/rnd/home/cary/"
@@ -15,20 +23,22 @@ home_build = "/home/cary/builds"
 users_prefix = "/Users/cary/"
 users_build = "/Users/cary/builds"
 
-PYTHON_ENABLE = 0
-PYIMATH_ENABLE_EXCEPTIONS=1
-OPENEXR_VIEWERS_ENABLE = 0
+PYTHON = 0
+USE_PYTHON2 = 0
 BUILD_TESTING = 1
-OPENEXR_RUN_FUZZ_TESTS = 1
+BUILD_SHARED_LIBS=1
+OPENEXR_BUILD_UTILS=1
+OPENEXR_INSTALL_EXAMPLES=1
+OPENEXR_RUN_FUZZ_TESTS = 0
+CMAKE_VERBOSE_MAKEFILE = 1
+CMAKE_BUILD_TYPE = "Release"
 
+CXX = "g++"
+C = "gcc"
 CXX_FLAGS = "-g"
 C_FLAGS = ""
 
-sanitize = None
-
-CMAKE_VERBOSE_MAKEFILE = 1
-#CMAKE_BUILD_TYPE = "debug"
-CMAKE_BUILD_TYPE = "release"
+CMAKE_CXX_STANDARD = 14
 
 def branch():
     on_branch = "On branch "
@@ -36,7 +46,7 @@ def branch():
     f = os.popen ("git status")
     lines = f.readlines()
     if len(lines) == 0:
-        return "."
+        return ""
     b = lines[0][:-1]
     if b.startswith (on_branch):
         b = b[len (on_branch):]
@@ -46,24 +56,48 @@ def branch():
         b = ""
     return "/" + b
 
-def run_cmake():
-    args = " ".join (sys.argv[2:])
-    cmd = "cmake %s %s" % (SRC_DIR, args)
-    cmd += " -DCMAKE_INSTALL_PREFIX=%s/install" % build
-    cmd += " -DCMAKE_SYSTEM_PREFIX=%s " % build
-    cmd += " -DCMAKE_CXX_COMPILER=%s " % CXX
-    cmd += " -DCMAKE_C_COMPILER=%s " % C
-    cmd += " -DCMAKE_CXX_FLAGS=\"%s\"" % CXX_FLAGS
-    cmd += " -DCMAKE_C_FLAGS=\"%s\"" % C_FLAGS
-    cmd += " -DPYTHON=%s " % PYTHON_ENABLE
-    cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
-    cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
-    cmd += " -DCMAKE_VERBOSE_MAKEFILE=%s" % CMAKE_VERBOSE_MAKEFILE
-    cmd += " -DCMAKE_BUILD_TYPE=%s" % CMAKE_BUILD_TYPE
-    
-    print cmd
-    os.system (cmd)
 
+args = []
+cmd = None
+
+for arg in sys.argv[1:]:
+    if arg == "build":
+        cmd = arg
+    elif arg == "cmake":
+        cmd = arg
+    elif arg == "clobber":
+        cmd = arg
+    elif arg == "debug":
+        CMAKE_BUILD_TYPE = "Debug"
+    elif arg == "release":
+        CMAKE_BUILD_TYPE = "Release"
+    elif arg == "python":
+        PYTHON = 1
+    elif arg == "python2":
+        PYTHON = 1
+        USE_PYTHON2 = 1
+    elif arg == "sanitize":
+        sanitize = "address"
+        sanitize = "undefined"
+        sanitize = "undefined,address"
+        CXX_FLAGS += " -fsanitize=%s " % sanitize
+        C_FLAGS += " -fsanitize=%s " % sanitize
+    elif arg == "-shared" or arg == "static":
+        BUILD_SHARED_LIBS = 0
+    elif arg == "-examples":
+        OPENEXR_INSTALL_EXAMPLES = 0
+    elif arg == "-utils":
+        OPENEXR_BUILD_UTILS = 0
+    elif arg == "-testing":
+        BUILD_TESTING = 0
+    elif arg == "11":
+        CMAKE_CXX_STANDARD = 11
+    elif arg == "clang":
+        CXX = "clang++"
+        C = "clang"
+    else:
+        args.append (arg)
+        
 SRC_DIR = os.getcwd()
 
 if SRC_DIR.startswith (lucas_ilm):
@@ -73,6 +107,8 @@ if SRC_DIR.startswith (ilm_prefix):
 
     project = SRC_DIR[len(ilm_prefix):]
     build = "%s/%s%s" % (ilm_build, project, branch())
+    if BUILD_SHARED_LIBS == 0:
+        build += "-static"
     if not path.exists (build):
         os.makedirs (build)
 
@@ -82,19 +118,12 @@ if SRC_DIR.startswith (ilm_prefix):
 elif SRC_DIR.startswith (home_prefix):
 
     project = SRC_DIR[len(home_prefix):]
-    build = "%s/%s%s" % (home_build, project, branch())
+    build = "%s/%s%s-%s" % (home_build, project, branch(), CMAKE_BUILD_TYPE)
+    if BUILD_SHARED_LIBS == 0:
+        build += "-static"
     if not path.exists (build):
         os.makedirs (build)
 
-    CXX = "g++"
-    C = "gcc"
-
-    CXX = "clang++"
-    C = "clang"
-
-    CXX_FLAGS += " -std=c++14"
-#    CXX_FLAGS += " -std=c++11"
-    
 elif SRC_DIR.startswith (users_prefix):
 
     project = SRC_DIR[len(users_prefix):]
@@ -105,39 +134,42 @@ elif SRC_DIR.startswith (users_prefix):
     CXX = "g++"
     C = "gcc"
 
-print build
+print(build)
 os.chdir (build)
 
-if len (sys.argv) == 1:
-    exit(0)
+if cmd == "cmake":
+
+    args = " ".join (args)
+    cmd = "%s %s %s" % (cmake_bin, SRC_DIR, args)
+    cmd += " -DCMAKE_BUILD_TYPE=%s" % CMAKE_BUILD_TYPE
+    cmd += " -DCMAKE_INSTALL_PREFIX=%s/install" % build
+    cmd += " -DBUILD_SHARED_LIBS=%s" % BUILD_SHARED_LIBS
+    cmd += " -DCMAKE_VERBOSE_MAKEFILE=%s" % CMAKE_VERBOSE_MAKEFILE
+    cmd += " -DCMAKE_CXX_STANDARD=%s " % CMAKE_CXX_STANDARD
+    cmd += " -DCMAKE_CXX_COMPILER=%s " % CXX
+    cmd += " -DCMAKE_C_COMPILER=%s " % C
+    cmd += " -DCMAKE_CXX_FLAGS=\"%s\"" % CXX_FLAGS
+    cmd += " -DCMAKE_C_FLAGS=\"%s\"" % C_FLAGS
+    cmd += " -DPYTHON=%s " % PYTHON
+    cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
+    cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
+    cmd += " -DOPENEXR_BUILD_UTILS=%s" % OPENEXR_BUILD_UTILS
+    cmd += " -DOPENEXR_INSTALL_EXAMPLES=%s" % OPENEXR_INSTALL_EXAMPLES
+    cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
     
-if sys.argv[1] == "cmake":
+    print(cmd)
+    os.system (cmd)
 
-    if len (sys.argv) > 2 and sys.argv[2] == "python":
-        sys.argv = sys.argv[0:1]
-        PYTHON_ENABLE = 1
-        
-    run_cmake()
-
-elif sys.argv[1] == "sanitize":
-
-    sanitize = "undefined,address"
-    sanitize = "address"
-    sanitize = "undefined"
-    CXX_FLAGS += " -fsanitize=%s " % sanitize
-    C_FLAGS += " -fsanitize=%s " % sanitize
-
-    run_cmake()
-
-elif sys.argv[1] == "clobber":
+elif cmd == "clobber":
 
     cmd = "rm -rf %s" % build
-    print cmd
+    print(cmd)
     os.system (cmd)
-    
-else:
 
-    cmd = " ".join(sys.argv[1:])
-    print cmd
+elif len(args) > 0:
+
+    cmd = " ".join(args)
+
+    print(cmd)
     os.system (cmd)
         
