@@ -3,6 +3,7 @@
 # cmk cmake clobber debug python sanitize -examples -utils -testing 
 
 import sys
+import subprocess
 import os
 import glob
 
@@ -26,15 +27,18 @@ users_build = "/Users/cary/builds"
 PYTHON = 0
 USE_PYTHON2 = 0
 BUILD_TESTING = 1
-BUILD_SHARED_LIBS=1
-OPENEXR_BUILD_UTILS=1
-OPENEXR_INSTALL_EXAMPLES=1
+BUILD_SHARED_LIBS = 1
+DOCS = 0
+OPENEXR_BUILD_UTILS = 1
+OPENEXR_BUILD_TOOLS = 1
+OPENEXR_INSTALL_EXAMPLES = 1
 OPENEXR_RUN_FUZZ_TESTS = 0
 CMAKE_VERBOSE_MAKEFILE = 1
 CMAKE_BUILD_TYPE = "Release"
 
 CMAKE_CXX_COMPILER = "g++"
-CMAKE_CXX_FLAGS = "-g"
+CMAKE_CXX_FLAGS = "-g -Wall"
+#CMAKE_CXX_FLAGS = "-g "
 CMAKE_CXX_STANDARD = 14
 CMAKE_CXX_OUTPUT_EXTENSION_REPLACE = 0
 CMAKE_EXE_LINKER_FLAGS = ""
@@ -45,11 +49,12 @@ CMAKE_C_FLAGS = ""
 def branch():
     on_branch = "On branch "
     head_detached_at = "HEAD detached at "
-    f = os.popen ("git status")
-    lines = f.readlines()
+    f = subprocess.Popen (["git", "status"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    lines = f.stdout.readlines()
     if len(lines) == 0:
         return ""
-    b = lines[0][:-1]
+    l = lines[0].decode("UTF-8")
+    b = l[:-1]
     if b.startswith (on_branch):
         b = b[len (on_branch):]
     elif b.startswith (head_detached_at):
@@ -60,10 +65,30 @@ def branch():
 
 def coverage():
 
-    files = glob.glob ("**/*.cpp", recursive=True)
-    for file in files:
-        print("file=%s" % file)
+# gcov -l -p -o ../_build/src/ImathTest/CMakeFiles/ImathTest.dir ../src/ImathTest/testFunction.cpp
+
+
+    files = glob.glob ("%s/**/*.gcno" % build, recursive=True)
+    for f in files:
+        dirname = os.path.dirname (f)
+        s = f.split('/')
+
+        cpp = '/' + s[1]
+        for w in s[2:-1]:
+            if w == "CMakeFiles" or w.endswith(".dir"):
+                continue
+            cpp += '/' + w
+        cpp += '/' + s[-1].rsplit('.')[0] + ".cpp"
+        cmd = "gcov -l -p -o %s %s\n" % (os.path.dirname(f), cpp)
+        print (cmd)
+        os.system(cmd)
+
         
+# The sed command below converts from:
+#   ../_build/src/OpenEXR/CMakeFiles/OpenColorIO.dir/ops/Exponent.gcno
+# to:
+#   ../src/OpenEXR/ops/Exponent.cpp
+#
 #for g in $(find ../_build -name "*.gcno" -type f); do
 #    gcov -l -p -o $(dirname "$g") $(echo "$g" | sed -e 's/\/_build\//\//' -e 's/\.gcno/\.cpp/' -e 's/\/CMakeFiles.*\.dir\//\//')
 #done
@@ -98,7 +123,8 @@ for arg in sys.argv[1:]:
         BUILD_SHARED_LIBS = 0
     elif arg == "-examples":
         OPENEXR_INSTALL_EXAMPLES = 0
-    elif arg == "-utils":
+    elif arg == "-tools":
+        OPENEXR_BUILD_TOOLS = 0
         OPENEXR_BUILD_UTILS = 0
     elif arg == "-testing":
         BUILD_TESTING = 0
@@ -108,10 +134,20 @@ for arg in sys.argv[1:]:
         CMAKE_CXX_COMPILER = "clang++"
         CMAKE_C_COMPILER = "clang"
     elif arg == "gcov":
-        CMAKE_CXX_FLAGS += "-g -O0 -fprofile-arcs -ftest-coverage"
+        CMAKE_CXX_FLAGS += " -g -O0 -fprofile-arcs -ftest-coverage"
         CMAKE_CXX_OUTPUT_EXTENSION_REPLACE = 1
         CMAKE_EXE_LINKER_FLAGS = "-lgcov"
+    elif arg == "f16c":
+        CMAKE_CXX_FLAGS += " -mf16c"
+        CMAKE_C_FLAGS += " -mf16c"
+    elif arg == "table":
+        CMAKE_CXX_FLAGS += " -DIMATH_HALF_NO_LOOKUP_TABLE=1"        
+        CMAKE_C_FLAGS += " -DIMATH_HALF_NO_LOOKUP_TABLE=1"        
+    elif arg == "docs":
+        DOCS = 1
     elif arg == "coverage":
+        cmd = arg
+    elif arg == "validate":
         cmd = arg
     else:
         args.append (arg)
@@ -183,8 +219,9 @@ if cmd == "cmake":
     cmd += " -DCMAKE_EXE_LINKER_FLAGS=%s" % CMAKE_EXE_LINKER_FLAGS
     cmd += " -DPYTHON=%s " % PYTHON
     cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
+    cmd += " -DDOCS=%s " % DOCS
     cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
-    cmd += " -DOPENEXR_BUILD_UTILS=%s" % OPENEXR_BUILD_UTILS
+    cmd += " -DOPENEXR_BUILD_TOOLS=%s" % OPENEXR_BUILD_TOOLS
     cmd += " -DOPENEXR_INSTALL_EXAMPLES=%s" % OPENEXR_INSTALL_EXAMPLES
     cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
 
@@ -200,6 +237,17 @@ elif cmd == "clobber":
 elif cmd == "coverage":
 
     coverage()
+    
+elif cmd == "validate":
+
+    os.chdir (SRC_DIR)
+
+    if SRC_DIR.find ("Imath") > 0:
+        os.system ("validate_imath_libs.sh %s/install ." % build)
+    elif SRC_DIR.find ("openexr") > 0:
+        os.system ("validate_openexr_libs.sh %s/install ." % build)
+    else:
+        print ("No validate.")
     
 elif len(args) > 0:
 
