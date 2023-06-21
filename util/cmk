@@ -28,7 +28,8 @@ PYTHON = 0
 USE_PYTHON2 = 0
 BUILD_TESTING = 1
 BUILD_SHARED_LIBS = 1
-DOCS = 0
+BUILD_THREADING = 1
+BUILD_DOCS = 0
 OPENEXR_BUILD_UTILS = 1
 OPENEXR_BUILD_TOOLS = 1
 OPENEXR_INSTALL_EXAMPLES = 1
@@ -102,6 +103,10 @@ for arg in sys.argv[1:]:
         cmd = arg
     elif arg == "cmake":
         cmd = arg
+    elif arg == "ctest":
+        cmd = arg
+    elif arg == "LastTest.log" or arg == "testlog":
+        cmd = "LastTest.log"
     elif arg == "clobber":
         cmd = arg
     elif arg == "debug":
@@ -121,6 +126,8 @@ for arg in sys.argv[1:]:
         CMAKE_C_FLAGS += " -fsanitize=%s " % sanitize
     elif arg == "-shared" or arg == "static":
         BUILD_SHARED_LIBS = 0
+    elif arg == "-thread" or arg == "thread":
+        BUILD_THREADING = 0
     elif arg == "-examples":
         OPENEXR_INSTALL_EXAMPLES = 0
     elif arg == "-tools":
@@ -144,7 +151,7 @@ for arg in sys.argv[1:]:
         CMAKE_CXX_FLAGS += " -DIMATH_HALF_NO_LOOKUP_TABLE=1"        
         CMAKE_C_FLAGS += " -DIMATH_HALF_NO_LOOKUP_TABLE=1"        
     elif arg == "docs":
-        DOCS = 1
+        BUILD_DOCS = 1
     elif arg == "coverage":
         cmd = arg
     elif arg == "validate":
@@ -189,8 +196,8 @@ elif SRC_DIR.startswith (users_prefix):
         os.makedirs (build)
 
     cmake_bin = "cmake"
-    CMAKE_CXX_COMPILER = "g++"
-    CMAKE_C_COMPILER = "gcc"
+#    CMAKE_CXX_COMPILER = "g++"
+#    CMAKE_C_COMPILER = "gcc"
 
 else:
 
@@ -209,6 +216,7 @@ if cmd == "cmake":
     cmd += " -DCMAKE_BUILD_TYPE=%s" % CMAKE_BUILD_TYPE
     cmd += " -DCMAKE_INSTALL_PREFIX=%s/install" % build
     cmd += " -DBUILD_SHARED_LIBS=%s" % BUILD_SHARED_LIBS
+    cmd += " -DOPENEXR_ENABLE_THREADING=%s" % BUILD_THREADING
     cmd += " -DCMAKE_VERBOSE_MAKEFILE=%s" % CMAKE_VERBOSE_MAKEFILE
     cmd += " -DCMAKE_CXX_STANDARD=%s " % CMAKE_CXX_STANDARD
     cmd += " -DCMAKE_CXX_COMPILER=%s " % CMAKE_CXX_COMPILER
@@ -219,7 +227,7 @@ if cmd == "cmake":
     cmd += " -DCMAKE_EXE_LINKER_FLAGS=%s" % CMAKE_EXE_LINKER_FLAGS
     cmd += " -DPYTHON=%s " % PYTHON
     cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
-    cmd += " -DDOCS=%s " % DOCS
+    cmd += " -DBUILD_DOCS=%s " % BUILD_DOCS
     cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
     cmd += " -DOPENEXR_BUILD_TOOLS=%s" % OPENEXR_BUILD_TOOLS
     cmd += " -DOPENEXR_INSTALL_EXAMPLES=%s" % OPENEXR_INSTALL_EXAMPLES
@@ -233,6 +241,21 @@ elif cmd == "clobber":
     cmd = "rm -rf %s" % build
     print(cmd)
     os.system (cmd)
+
+elif cmd == "ctest":
+
+    cmd = f"ctest {' '.join(args)}"
+    print(cmd)
+    os.system(cmd)
+    print("\n")
+
+    cmd = f"cat {build}/Testing/Temporary/LastTest.log"
+    print(cmd)
+    os.system(cmd)
+    
+elif cmd == "LastTest.log":
+    
+    os.system(f"cat {build}/Testing/Temporary/LastTest.log")
 
 elif cmd == "coverage":
 
