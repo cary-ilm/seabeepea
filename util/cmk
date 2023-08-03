@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-# cmk cmake clobber debug python sanitize -examples -utils -testing 
+# cmk cmake clobber debug python sanitize -examples -tools -testing 
+
+# cmk cmake -DImath_DIR=/home/cary/builds/src/cary-ilm/Imath/interop-fix2-Release/install/lib/cmake/Imath
 
 import sys
 import subprocess
@@ -12,6 +14,7 @@ CMAKE_VERSION = "3.10.3"
 
 cmake_bin = "/home/cary/src/cmake/%s/bin/cmake" % CMAKE_VERSION
 cmake_bin = "/usr/bin/cmake"
+cmake_bin = "/home/cary/anaconda3/bin/cmake"
 
 lucas_ilm = "/lucas/ilm"
 ilm_prefix = "/dept/rnd/home/cary/"
@@ -30,6 +33,7 @@ BUILD_TESTING = 1
 BUILD_SHARED_LIBS = 1
 BUILD_THREADING = 1
 BUILD_DOCS = 0
+BUILD_WEBSITE = 0
 OPENEXR_BUILD_UTILS = 1
 OPENEXR_BUILD_TOOLS = 1
 OPENEXR_INSTALL_EXAMPLES = 1
@@ -37,15 +41,22 @@ OPENEXR_RUN_FUZZ_TESTS = 0
 CMAKE_VERBOSE_MAKEFILE = 1
 CMAKE_BUILD_TYPE = "Release"
 
-CMAKE_CXX_COMPILER = "g++"
+CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/main-Release/install"
+CMAKE_CXX_COMPILER = "g++-12"
+CMAKE_CXX_COMPILER = "g++-11"
 CMAKE_CXX_FLAGS = "-g -Wall"
 #CMAKE_CXX_FLAGS = "-g "
-CMAKE_CXX_STANDARD = 14
+CMAKE_CXX_STANDARD = 17
 CMAKE_CXX_OUTPUT_EXTENSION_REPLACE = 0
+CMAKE_C_OUTPUT_EXTENSION_REPLACE = 0
 CMAKE_EXE_LINKER_FLAGS = ""
-CMAKE_C_COMPILER = "gcc"
+CMAKE_C_COMPILER = "gcc-12"
+CMAKE_C_COMPILER = "gcc-11"
 CMAKE_C_FLAGS = ""
+CMAKE_TOOLCHAIN_FILE=None
+OPENEXR_FORCE_INTERNAL_DEFLATE=None
 
+GCOV = "gcov-11"
 
 def branch():
     on_branch = "On branch "
@@ -111,6 +122,8 @@ for arg in sys.argv[1:]:
         cmd = arg
     elif arg == "debug":
         CMAKE_BUILD_TYPE = "Debug"
+        CMAKE_CXX_FLAGS = "-ggdb3 -Og"
+        CMAKE_C_FLAGS = "-ggdb3 -Og"
     elif arg == "release":
         CMAKE_BUILD_TYPE = "Release"
     elif arg == "python":
@@ -130,11 +143,17 @@ for arg in sys.argv[1:]:
         BUILD_THREADING = 0
     elif arg == "-examples":
         OPENEXR_INSTALL_EXAMPLES = 0
-    elif arg == "-tools":
+    elif arg == "-tools" or arg == "-utils":
         OPENEXR_BUILD_TOOLS = 0
         OPENEXR_BUILD_UTILS = 0
-    elif arg == "-testing":
+    elif arg == "-test" or arg == "-testing":
         BUILD_TESTING = 0
+    elif arg == "deflate":
+        OPENEXR_FORCE_INTERNAL_DEFLATE = True
+    elif arg == "aarch64":
+        CMAKE_TOOLCHAIN_FILE = "cross-compilation-aarch64.cmake"
+        CMAKE_C_COMPILER = "aarch64-linux-gnu-gcc"
+        CMAKE_CXX_COMPILER = "aarch64-linux-gnu-g++"
     elif arg == "11":
         CMAKE_CXX_STANDARD = 11
     elif arg == "clang":
@@ -143,6 +162,8 @@ for arg in sys.argv[1:]:
     elif arg == "gcov":
         CMAKE_CXX_FLAGS += " -g -O0 -fprofile-arcs -ftest-coverage"
         CMAKE_CXX_OUTPUT_EXTENSION_REPLACE = 1
+        CMAKE_C_FLAGS += " -g -O0 -fprofile-arcs -ftest-coverage"
+        CMAKE_C_OUTPUT_EXTENSION_REPLACE = 1
         CMAKE_EXE_LINKER_FLAGS = "-lgcov"
     elif arg == "f16c":
         CMAKE_CXX_FLAGS += " -mf16c"
@@ -150,8 +171,11 @@ for arg in sys.argv[1:]:
     elif arg == "table":
         CMAKE_CXX_FLAGS += " -DIMATH_HALF_NO_LOOKUP_TABLE=1"        
         CMAKE_C_FLAGS += " -DIMATH_HALF_NO_LOOKUP_TABLE=1"        
-    elif arg == "docs":
+    elif arg == "docs" or arg == "website":
         BUILD_DOCS = 1
+        BUILD_WEBSITE = 1
+        if sys.argv[1] == "make":
+            args.append ("website")
     elif arg == "coverage":
         cmd = arg
     elif arg == "validate":
@@ -209,10 +233,18 @@ os.chdir (build)
 if len (sys.argv) == 1:
     exit(0)
     
+if CMAKE_TOOLCHAIN_FILE:
+    with open(CMAKE_TOOLCHAIN_FILE, "w") as f: 
+        f.write("set(CMAKE_SYSTEM_NAME Linux)\n")
+        f.write("set(CMAKE_SYSTEM_PROCESSOR aarch64)\n")
+        f.write("set(CMAKE_CROSSCOMPILING TRUE)\n")
+
 if cmd == "cmake":
 
     args = " ".join (args)
     cmd = "%s %s %s" % (cmake_bin, SRC_DIR, args)
+    if CMAKE_PREFIX_PATH:
+        cmd += " -DCMAKE_PREFIX_PATH=%s" % CMAKE_PREFIX_PATH
     cmd += " -DCMAKE_BUILD_TYPE=%s" % CMAKE_BUILD_TYPE
     cmd += " -DCMAKE_INSTALL_PREFIX=%s/install" % build
     cmd += " -DBUILD_SHARED_LIBS=%s" % BUILD_SHARED_LIBS
@@ -224,10 +256,17 @@ if cmd == "cmake":
     cmd += " -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=%s" % CMAKE_CXX_OUTPUT_EXTENSION_REPLACE
     cmd += " -DCMAKE_C_COMPILER=%s " % CMAKE_C_COMPILER
     cmd += " -DCMAKE_C_FLAGS=\"%s\"" % CMAKE_C_FLAGS
+    cmd += " -DCMAKE_C_OUTPUT_EXTENSION_REPLACE=%s" % CMAKE_C_OUTPUT_EXTENSION_REPLACE
     cmd += " -DCMAKE_EXE_LINKER_FLAGS=%s" % CMAKE_EXE_LINKER_FLAGS
+    if CMAKE_TOOLCHAIN_FILE:
+        cmd += "  -DCMAKE_TOOLCHAIN_FILE=%s" % CMAKE_TOOLCHAIN_FILE
+        cmd += "  -DOPENEXR_FORCE_INTERNAL_DEFLATE='ON'"
+    if OPENEXR_FORCE_INTERNAL_DEFLATE:
+        cmd += "  -DOPENEXR_FORCE_INTERNAL_DEFLATE='ON'"
     cmd += " -DPYTHON=%s " % PYTHON
     cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
     cmd += " -DBUILD_DOCS=%s " % BUILD_DOCS
+    cmd += " -DBUILD_WEBSITE=%s " % BUILD_WEBSITE
     cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
     cmd += " -DOPENEXR_BUILD_TOOLS=%s" % OPENEXR_BUILD_TOOLS
     cmd += " -DOPENEXR_INSTALL_EXAMPLES=%s" % OPENEXR_INSTALL_EXAMPLES
@@ -276,6 +315,6 @@ elif len(args) > 0:
 
     cmd = " ".join(args)
 
-    print(cmd)
+    print(f"os.system({cmd})")
     os.system (cmd)
         
