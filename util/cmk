@@ -28,6 +28,7 @@ users_prefix = "/Users/cary/"
 users_build = "/Users/cary/builds"
 
 PYTHON = 0
+PIP = 0
 USE_PYTHON2 = 0
 BUILD_TESTING = 1
 BUILD_SHARED_LIBS = 1
@@ -41,7 +42,13 @@ OPENEXR_RUN_FUZZ_TESTS = 0
 CMAKE_VERBOSE_MAKEFILE = 1
 CMAKE_BUILD_TYPE = "Release"
 
-CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/main-Release/install"
+CMAKE_PREFIX_PATH = None
+#CMAKE_PREFIX_PATH = "/home/cary/builds/releases/openexr-3.2.0-Release/install/lib/cmake"
+#CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/fix_export_setting-Release/install"
+#CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/main-Release/install"
+#CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/main-Release/install:/home/cary/builds/src/ebiggers/libdeflate/master-Release/install/lib"
+#CMAKE_PREFIX_PATH = "/home/cary/builds/src/ebiggers/libdeflate/master-Release/install/lib"
+
 CMAKE_CXX_COMPILER = "g++-12"
 CMAKE_CXX_COMPILER = "g++-11"
 CMAKE_CXX_FLAGS = "-g -Wall"
@@ -55,6 +62,10 @@ CMAKE_C_COMPILER = "gcc-11"
 CMAKE_C_FLAGS = ""
 CMAKE_TOOLCHAIN_FILE=None
 OPENEXR_FORCE_INTERNAL_DEFLATE=None
+OPENEXR_IMAGES_REPO="file:///home/cary/src/AcademySoftwareFoundation/openexr-images"
+#OPENEXR_IMAGES_REPO="file:///home/cary/src/AcademySoftwareFoundation/openexr-images.git"
+OPENEXR_IMAGES_TAG="v1.0"
+OPENEXR_IMAGES_TAG=""
 
 GCOV = "gcov-11"
 
@@ -128,6 +139,8 @@ for arg in sys.argv[1:]:
         CMAKE_BUILD_TYPE = "Release"
     elif arg == "python":
         PYTHON = 1
+    elif arg == "pip":
+        PIP = 1
     elif arg == "python2":
         PYTHON = 1
         USE_PYTHON2 = 1
@@ -154,6 +167,11 @@ for arg in sys.argv[1:]:
         CMAKE_TOOLCHAIN_FILE = "cross-compilation-aarch64.cmake"
         CMAKE_C_COMPILER = "aarch64-linux-gnu-gcc"
         CMAKE_CXX_COMPILER = "aarch64-linux-gnu-g++"
+    elif arg == "mingw":
+        CMAKE_TOOLCHAIN_FILE = "cross-compilation-mingw.cmake"
+#        CMAKE_TOOLCHAIN_FILE = "cmake/Toolchain-mingw.cmake"
+        CMAKE_C_COMPILER = "x86_64-w64-mingw32-gcc-posix"
+        CMAKE_CXX_COMPILER = "x86_64-w64-mingw32-g++-posix"
     elif arg == "11":
         CMAKE_CXX_STANDARD = 11
     elif arg == "clang":
@@ -234,11 +252,19 @@ if len (sys.argv) == 1:
     exit(0)
     
 if CMAKE_TOOLCHAIN_FILE:
-    with open(CMAKE_TOOLCHAIN_FILE, "w") as f: 
-        f.write("set(CMAKE_SYSTEM_NAME Linux)\n")
-        f.write("set(CMAKE_SYSTEM_PROCESSOR aarch64)\n")
-        f.write("set(CMAKE_CROSSCOMPILING TRUE)\n")
-
+    if "aarch64" in CMAKE_TOOLCHAIN_FILE:
+        with open(CMAKE_TOOLCHAIN_FILE, "w") as f: 
+            f.write("set(CMAKE_SYSTEM_NAME Linux)\n")
+            f.write("set(CMAKE_SYSTEM_PROCESSOR aarch64)\n")
+            f.write("set(CMAKE_CROSSCOMPILING TRUE)\n")
+    elif "mingw" in CMAKE_TOOLCHAIN_FILE:
+        with open(CMAKE_TOOLCHAIN_FILE, "w") as f: 
+            f.write("set(CMAKE_SYSTEM_NAME Windows)\n")
+            f.write("set(TOOLCHAIN_PREFIX x86_64-w64-mingw32)\n")
+            f.write("set(CMAKE_CROSSCOMPILING TRUE)\n")
+            f.write("set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc-posix)\n")
+            f.write("set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++-posix)\n")
+            
 if cmd == "cmake":
 
     args = " ".join (args)
@@ -268,9 +294,15 @@ if cmd == "cmake":
     cmd += " -DBUILD_DOCS=%s " % BUILD_DOCS
     cmd += " -DBUILD_WEBSITE=%s " % BUILD_WEBSITE
     cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
+    cmd += " -DOPENEXR_BUILD_PYTHON=%s" % PIP
     cmd += " -DOPENEXR_BUILD_TOOLS=%s" % OPENEXR_BUILD_TOOLS
     cmd += " -DOPENEXR_INSTALL_EXAMPLES=%s" % OPENEXR_INSTALL_EXAMPLES
     cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
+    if OPENEXR_IMAGES_REPO:
+        cmd += " -DOPENEXR_IMAGES_REPO=%s" % OPENEXR_IMAGES_REPO
+        cmd += " -DOPENEXR_IMAGES_TAG=%s" % OPENEXR_IMAGES_TAG
+    if OPENEXR_IMAGES_TAG:
+        cmd += " -DOPENEXR_IMAGES_TAG=%s" % OPENEXR_IMAGES_TAG
 
     print(cmd)
     os.system (cmd)
