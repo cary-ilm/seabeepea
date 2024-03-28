@@ -35,19 +35,21 @@ BUILD_SHARED_LIBS = 1
 BUILD_THREADING = 1
 BUILD_DOCS = 0
 BUILD_WEBSITE = 0
-OPENEXR_BUILD_UTILS = 1
+OPENEXR_INSTALL = 1
 OPENEXR_BUILD_TOOLS = 1
-OPENEXR_INSTALL_EXAMPLES = 1
+OPENEXR_BUILD_LIBS = 1
+OPENEXR_BUILD_EXAMPLES = 1
 OPENEXR_RUN_FUZZ_TESTS = 0
 CMAKE_VERBOSE_MAKEFILE = 1
 CMAKE_BUILD_TYPE = "Release"
 
 CMAKE_PREFIX_PATH = None
+#CMAKE_PREFIX_PATH ="/Users/cary/builds/releases/Imath-3.1.9-Release/install"
 #CMAKE_PREFIX_PATH = "/home/cary/builds/releases/openexr-3.2.0-Release/install/lib/cmake"
 #CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/fix_export_setting-Release/install"
-#CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/main-Release/install"
 #CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/main-Release/install:/home/cary/builds/src/ebiggers/libdeflate/master-Release/install/lib"
 #CMAKE_PREFIX_PATH = "/home/cary/builds/src/ebiggers/libdeflate/master-Release/install/lib"
+CMAKE_PREFIX_PATH = "/Users/cary/builds/src/ebiggers/libdeflate/master-Release/install"
 
 CMAKE_CXX_COMPILER = "g++-12"
 CMAKE_CXX_COMPILER = "g++-11"
@@ -59,10 +61,13 @@ CMAKE_C_OUTPUT_EXTENSION_REPLACE = 0
 CMAKE_EXE_LINKER_FLAGS = ""
 CMAKE_C_COMPILER = "gcc-12"
 CMAKE_C_COMPILER = "gcc-11"
+CMAKE_C_COMPILER = "gcc"
+CMAKE_CXX_COMPILER = "g++"
 CMAKE_C_FLAGS = ""
 CMAKE_TOOLCHAIN_FILE=None
-OPENEXR_FORCE_INTERNAL_DEFLATE=None
-OPENEXR_IMAGES_REPO="file:///home/cary/src/AcademySoftwareFoundation/openexr-images"
+OPENEXR_FORCE_INTERNAL_IMATH=None
+OPENEXR_FORCE_INTERNAL_DEFLATE=0
+OPENEXR_IMAGES_REPO="file:///Users/cary/src/cary-ilm/openexr-images"
 #OPENEXR_IMAGES_REPO="file:///home/cary/src/AcademySoftwareFoundation/openexr-images.git"
 OPENEXR_IMAGES_TAG="v1.0"
 OPENEXR_IMAGES_TAG=""
@@ -154,15 +159,20 @@ for arg in sys.argv[1:]:
         BUILD_SHARED_LIBS = 0
     elif arg == "-thread" or arg == "thread":
         BUILD_THREADING = 0
+    elif arg == "-install":
+        OPENEXR_INSTALL = 0
     elif arg == "-examples":
-        OPENEXR_INSTALL_EXAMPLES = 0
-    elif arg == "-tools" or arg == "-utils":
+        OPENEXR_BUILD_EXAMPLES = 0
+    elif arg == "-libs":
+        OPENEXR_BUILD_LIBS = 0
+    elif arg == "-tools":
         OPENEXR_BUILD_TOOLS = 0
-        OPENEXR_BUILD_UTILS = 0
-    elif arg == "-test" or arg == "-testing":
+    elif arg == "-test" or arg == "tests" or arg == "-testing":
         BUILD_TESTING = 0
     elif arg == "deflate":
         OPENEXR_FORCE_INTERNAL_DEFLATE = True
+    elif arg == "imath":
+        OPENEXR_FORCE_INTERNAL_IMATH = True
     elif arg == "aarch64":
         CMAKE_TOOLCHAIN_FILE = "cross-compilation-aarch64.cmake"
         CMAKE_C_COMPILER = "aarch64-linux-gnu-gcc"
@@ -287,16 +297,19 @@ if cmd == "cmake":
     if CMAKE_TOOLCHAIN_FILE:
         cmd += "  -DCMAKE_TOOLCHAIN_FILE=%s" % CMAKE_TOOLCHAIN_FILE
         cmd += "  -DOPENEXR_FORCE_INTERNAL_DEFLATE='ON'"
-    if OPENEXR_FORCE_INTERNAL_DEFLATE:
-        cmd += "  -DOPENEXR_FORCE_INTERNAL_DEFLATE='ON'"
+    cmd += " -DOPENEXR_FORCE_INTERNAL_DEFLATE=%s " % OPENEXR_FORCE_INTERNAL_DEFLATE
+    if OPENEXR_FORCE_INTERNAL_IMATH:
+        cmd += " -DOPENEXR_FORCE_INTERNAL_IMATH=%s " % OPENEXR_FORCE_INTERNAL_IMATH
     cmd += " -DPYTHON=%s " % PYTHON
     cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
     cmd += " -DBUILD_DOCS=%s " % BUILD_DOCS
     cmd += " -DBUILD_WEBSITE=%s " % BUILD_WEBSITE
     cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
-    cmd += " -DOPENEXR_BUILD_PYTHON=%s" % PIP
+    cmd += " -DOPENEXR_INSTALL=%s" % OPENEXR_INSTALL
+    cmd += " -DOPENEXR_BUILD_LIBS=%s" % OPENEXR_BUILD_LIBS
     cmd += " -DOPENEXR_BUILD_TOOLS=%s" % OPENEXR_BUILD_TOOLS
-    cmd += " -DOPENEXR_INSTALL_EXAMPLES=%s" % OPENEXR_INSTALL_EXAMPLES
+    cmd += " -DOPENEXR_BUILD_EXAMPLES=%s" % OPENEXR_BUILD_EXAMPLES
+    cmd += " -DOPENEXR_BUILD_PYTHON=%s" % PIP
     cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
     if OPENEXR_IMAGES_REPO:
         cmd += " -DOPENEXR_IMAGES_REPO=%s" % OPENEXR_IMAGES_REPO
