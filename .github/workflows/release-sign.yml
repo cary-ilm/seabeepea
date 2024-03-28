@@ -55,7 +55,7 @@ jobs:
       - name: Sign archive with Sigstore
         uses: sigstore/gh-action-sigstore-python@v2.1.1
         with:
-          inputs: ${}
+          inputs: ${OPENEXR_TARBALL}
 
       - name: Upload release archive
         env:
