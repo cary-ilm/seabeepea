@@ -22,10 +22,8 @@ on:
     types: [published]
 
 permissions:
-  contents: write
-  id-token: write
-  repository-projects: write
-  
+  contents: read
+
 jobs:
   release:
     name: Sign & upload release artifacts
@@ -34,6 +32,11 @@ jobs:
     env:
        TAG: ${{ github.ref_name }}
        
+    permissions:
+      contents: write
+      id-token: write
+      repository-projects: write
+
     steps:
 
       - name: Set Prefix
