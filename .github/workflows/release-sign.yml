@@ -57,4 +57,4 @@ jobs:
             ${{ env.IMATH_ARCHIVE }}.zip
             ${{ env.IMATH_ARCHIVE }}.tar.gz
           upload-signing-artifacts: true
-          release-signing-artifacts: false
+          release-signing-artifacts: true
