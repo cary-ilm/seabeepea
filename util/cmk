@@ -28,6 +28,7 @@ users_prefix = "/Users/cary/"
 users_build = "/Users/cary/builds"
 
 PYTHON = 0
+PYBIND11 = 0
 PIP = 0
 USE_PYTHON2 = 0
 BUILD_TESTING = 1
@@ -47,13 +48,14 @@ CMAKE_PREFIX_PATH = None
 #CMAKE_PREFIX_PATH ="/Users/cary/builds/releases/Imath-3.1.9-Release/install"
 #CMAKE_PREFIX_PATH = "/home/cary/builds/releases/openexr-3.2.0-Release/install/lib/cmake"
 #CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/fix_export_setting-Release/install"
-#CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/main-Release/install:/home/cary/builds/src/ebiggers/libdeflate/master-Release/install/lib"
+CMAKE_PREFIX_PATH = "/home/cary/builds/src/cary-ilm/Imath/main-Release/install:/home/cary/builds/src/ebiggers/libdeflate/master-Release/install/lib"
 #CMAKE_PREFIX_PATH = "/home/cary/builds/src/ebiggers/libdeflate/master-Release/install/lib"
-CMAKE_PREFIX_PATH = "/Users/cary/builds/src/ebiggers/libdeflate/master-Release/install"
+#CMAKE_PREFIX_PATH = "/Users/cary/builds/src/ebiggers/libdeflate/master-Release/install"
 
 CMAKE_CXX_COMPILER = "g++-12"
 CMAKE_CXX_COMPILER = "g++-11"
 CMAKE_CXX_FLAGS = "-g -Wall"
+#CMAKE_CXX_FLAGS = "-g -Wall -I/home/cary/anaconda3/lib/python3.10/site-packages/numpy/core/include"
 #CMAKE_CXX_FLAGS = "-g "
 CMAKE_CXX_STANDARD = 17
 CMAKE_CXX_OUTPUT_EXTENSION_REPLACE = 0
@@ -67,12 +69,15 @@ CMAKE_C_FLAGS = ""
 CMAKE_TOOLCHAIN_FILE=None
 OPENEXR_FORCE_INTERNAL_IMATH=None
 OPENEXR_FORCE_INTERNAL_DEFLATE=0
-OPENEXR_IMAGES_REPO="file:///Users/cary/src/cary-ilm/openexr-images"
-#OPENEXR_IMAGES_REPO="file:///home/cary/src/AcademySoftwareFoundation/openexr-images.git"
+
+#OPENEXR_IMAGES_REPO="file:///Users/cary/src/cary-ilm/openexr-images"
+OPENEXR_IMAGES_REPO="file:///home/cary/src/AcademySoftwareFoundation/openexr-images"
 OPENEXR_IMAGES_TAG="v1.0"
 OPENEXR_IMAGES_TAG=""
 
 GCOV = "gcov-11"
+
+sanitize = ""
 
 def branch():
     on_branch = "On branch "
@@ -144,12 +149,15 @@ for arg in sys.argv[1:]:
         CMAKE_BUILD_TYPE = "Release"
     elif arg == "python":
         PYTHON = 1
+    elif arg == "pybind11":
+        PYBIND11 = 1
     elif arg == "pip":
         PIP = 1
     elif arg == "python2":
         PYTHON = 1
         USE_PYTHON2 = 1
     elif arg == "sanitize":
+        CMAKE_BUILD_TYPE = "Debug"
         sanitize = "address"
         sanitize = "undefined"
         sanitize = "undefined,address"
@@ -167,7 +175,7 @@ for arg in sys.argv[1:]:
         OPENEXR_BUILD_LIBS = 0
     elif arg == "-tools":
         OPENEXR_BUILD_TOOLS = 0
-    elif arg == "-test" or arg == "tests" or arg == "-testing":
+    elif arg == "-test" or arg == "-tests" or arg == "-testing":
         BUILD_TESTING = 0
     elif arg == "deflate":
         OPENEXR_FORCE_INTERNAL_DEFLATE = True
@@ -213,6 +221,10 @@ for arg in sys.argv[1:]:
         
 SRC_DIR = os.getcwd()
 
+if SRC_DIR == "/home/cary/src/cary-ilm/openexr/src/wrappers/python/tests":
+    os.system("./test_pybind.sh")
+    exit(0)
+    
 if SRC_DIR.startswith (lucas_ilm):
 
     SRC_DIR = SRC_DIR[len(lucas_ilm):]
@@ -232,7 +244,9 @@ if SRC_DIR.startswith (ilm_prefix):
 elif SRC_DIR.startswith (home_prefix):
 
     project = SRC_DIR[len(home_prefix):]
-    build = "%s/%s%s-%s" % (home_build, project, branch(), CMAKE_BUILD_TYPE)
+    build = f"{home_build}/{project}{branch()}-{CMAKE_BUILD_TYPE}"
+    if sanitize:
+        build += "-sanitize"
     if BUILD_SHARED_LIBS == 0:
         build += "-static"
     if not os.path.exists (build):
@@ -241,7 +255,9 @@ elif SRC_DIR.startswith (home_prefix):
 elif SRC_DIR.startswith (users_prefix):
 
     project = SRC_DIR[len(users_prefix):]
-    build = "%s/%s%s-%s" % (users_build, project, branch(), CMAKE_BUILD_TYPE)
+    build = f"{users_build}/{project}{branch()}-{CMAKE_BUILD_TYPE}"
+    if sanitize:
+        build += "-sanitize"
     if BUILD_SHARED_LIBS == 0:
         build += "-static"
     if not os.path.exists (build):
@@ -300,7 +316,10 @@ if cmd == "cmake":
     cmd += " -DOPENEXR_FORCE_INTERNAL_DEFLATE=%s " % OPENEXR_FORCE_INTERNAL_DEFLATE
     if OPENEXR_FORCE_INTERNAL_IMATH:
         cmd += " -DOPENEXR_FORCE_INTERNAL_IMATH=%s " % OPENEXR_FORCE_INTERNAL_IMATH
-    cmd += " -DPYTHON=%s " % PYTHON
+    if PYTHON:
+        cmd += " -DPYTHON=%s " % PYTHON
+    if PYBIND11:
+        cmd += " -DPYBIND11=%s " % PYBIND11
     cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
     cmd += " -DBUILD_DOCS=%s " % BUILD_DOCS
     cmd += " -DBUILD_WEBSITE=%s " % BUILD_WEBSITE
