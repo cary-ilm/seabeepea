@@ -28,6 +28,7 @@ users_prefix = "/Users/cary/"
 users_build = "/Users/cary/builds"
 
 PYTHON = 0
+PYBIND11 = 0
 PIP = 0
 USE_PYTHON2 = 0
 BUILD_TESTING = 1
@@ -140,6 +141,8 @@ for arg in sys.argv[1:]:
         CMAKE_BUILD_TYPE = "Release"
     elif arg == "python":
         PYTHON = 1
+    elif arg == "pybind11":
+        PYBIND11 = 1
     elif arg == "pip":
         PIP = 1
     elif arg == "python2":
@@ -302,6 +305,8 @@ if cmd == "cmake":
     if OPENEXR_FORCE_INTERNAL_IMATH:
         cmd += "  -DOPENEXR_FORCE_INTERNAL_IMATH='ON'"
     cmd += " -DPYTHON=%s " % PYTHON
+    if PYBIND11:
+        cmd += " -DPYBIND11=%s " % PYBIND11
     cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
     cmd += " -DBUILD_DOCS=%s " % BUILD_DOCS
     cmd += " -DBUILD_WEBSITE=%s " % BUILD_WEBSITE
