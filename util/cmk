@@ -64,10 +64,10 @@ CMAKE_C_FLAGS = ""
 CMAKE_TOOLCHAIN_FILE=None
 OPENEXR_FORCE_INTERNAL_DEFLATE=None
 OPENEXR_FORCE_INTERNAL_IMATH=None
-OPENEXR_IMAGES_REPO="file:///home/cary/src/AcademySoftwareFoundation/openexr-images"
+#OPENEXR_IMAGES_REPO="file:///home/cary/src/AcademySoftwareFoundation/openexr-images"
 #OPENEXR_IMAGES_REPO="file:///home/cary/src/AcademySoftwareFoundation/openexr-images.git"
-OPENEXR_IMAGES_TAG="v1.0"
-OPENEXR_IMAGES_TAG=""
+#OPENEXR_IMAGES_TAG="v1.0"
+#OPENEXR_IMAGES_TAG=""
 
 GCOV = "gcov-11"
 
@@ -244,8 +244,8 @@ elif SRC_DIR.startswith (users_prefix):
         os.makedirs (build)
 
     cmake_bin = "cmake"
-#    CMAKE_CXX_COMPILER = "g++"
-#    CMAKE_C_COMPILER = "gcc"
+    CMAKE_CXX_COMPILER = "g++"
+    CMAKE_C_COMPILER = "gcc"
 
 else:
 
@@ -315,11 +315,11 @@ if cmd == "cmake":
     cmd += " -DOPENEXR_BUILD_TOOLS=%s" % OPENEXR_BUILD_TOOLS
     cmd += " -DOPENEXR_INSTALL_EXAMPLES=%s" % OPENEXR_INSTALL_EXAMPLES
     cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
-    if OPENEXR_IMAGES_REPO:
-        cmd += " -DOPENEXR_IMAGES_REPO=%s" % OPENEXR_IMAGES_REPO
-        cmd += " -DOPENEXR_IMAGES_TAG=%s" % OPENEXR_IMAGES_TAG
-    if OPENEXR_IMAGES_TAG:
-        cmd += " -DOPENEXR_IMAGES_TAG=%s" % OPENEXR_IMAGES_TAG
+#    if OPENEXR_IMAGES_REPO:
+#        cmd += " -DOPENEXR_IMAGES_REPO=%s" % OPENEXR_IMAGES_REPO
+#        cmd += " -DOPENEXR_IMAGES_TAG=%s" % OPENEXR_IMAGES_TAG
+#    if OPENEXR_IMAGES_TAG:
+#        cmd += " -DOPENEXR_IMAGES_TAG=%s" % OPENEXR_IMAGES_TAG
 
     print(cmd)
     os.system (cmd)

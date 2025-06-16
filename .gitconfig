@@ -14,7 +14,9 @@
 
 [push]
 	autoSetupRemote = true
+
 [diff]
 	tool = meld
+
 [difftool]
 	prompt = false
