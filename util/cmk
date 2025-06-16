@@ -34,13 +34,13 @@ USE_PYTHON2 = 0
 BUILD_TESTING = 1
 BUILD_SHARED_LIBS = 1
 BUILD_THREADING = 1
-BUILD_DOCS = 0
 BUILD_WEBSITE = 0
 OPENEXR_INSTALL = 1
 OPENEXR_BUILD_TOOLS = 1
 OPENEXR_BUILD_LIBS = 1
 OPENEXR_BUILD_EXAMPLES = 1
 OPENEXR_RUN_FUZZ_TESTS = 0
+OPENEXR_INSTALL_DOCS = 1
 CMAKE_VERBOSE_MAKEFILE = 1
 CMAKE_BUILD_TYPE = "Release"
 
@@ -207,8 +207,9 @@ for arg in sys.argv[1:]:
     elif arg == "table":
         CMAKE_CXX_FLAGS += " -DIMATH_HALF_NO_LOOKUP_TABLE=1"        
         CMAKE_C_FLAGS += " -DIMATH_HALF_NO_LOOKUP_TABLE=1"        
-    elif arg == "docs" or arg == "website":
-        BUILD_DOCS = 1
+    elif arg == "-docs":
+        OPENEXR_INSTALL_DOCS = 0
+    elif arg == "website":
         BUILD_WEBSITE = 1
         if sys.argv[1] == "make":
             args.append ("website")
@@ -321,13 +322,13 @@ if cmd == "cmake":
     if PYBIND11:
         cmd += " -DPYBIND11=%s " % PYBIND11
     cmd += " -DUSE_PYTHON2=%s " % USE_PYTHON2
-    cmd += " -DBUILD_DOCS=%s " % BUILD_DOCS
     cmd += " -DBUILD_WEBSITE=%s " % BUILD_WEBSITE
     cmd += " -DBUILD_TESTING=%s" % BUILD_TESTING
     cmd += " -DOPENEXR_INSTALL=%s" % OPENEXR_INSTALL
     cmd += " -DOPENEXR_BUILD_LIBS=%s" % OPENEXR_BUILD_LIBS
     cmd += " -DOPENEXR_BUILD_TOOLS=%s" % OPENEXR_BUILD_TOOLS
     cmd += " -DOPENEXR_BUILD_EXAMPLES=%s" % OPENEXR_BUILD_EXAMPLES
+    cmd += " -DOPENEXR_INSTALL_DOCS=%s " % OPENEXR_INSTALL_DOCS
     cmd += " -DOPENEXR_BUILD_PYTHON=%s" % PIP
     cmd += " -DOPENEXR_RUN_FUZZ_TESTS=%s" % OPENEXR_RUN_FUZZ_TESTS
     if OPENEXR_IMAGES_REPO:

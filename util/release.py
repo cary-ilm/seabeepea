@@ -24,6 +24,7 @@ def extract_section(content, version_tag):
     release_date = None
     
     for line in lines:
+
         # Look for the start of the requested version section
         m = version_header.match(line)
         if m:
@@ -83,22 +84,60 @@ def update_news_file(release_notes, tag, release_date):
     date_str = release_date.strftime("%B %e, %Y")
     section_title = f"{date_str} - OpenEXR {tag} Released"
 
-    result = run(['git', 'show', f"HEAD:website/news.rst"], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+    result = run(['git', 'show', f"main:website/news.rst"], stdout=PIPE, stderr=PIPE, universal_newlines=True)
     content = result.stdout
 
+    result = run(['git', 'show', f"main:website/latest_news_title.rst"], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+    previous_news_title = result.stdout.split('::', 1)[1].strip()
+    
+    pattern = r'(?m)^(\|latest-news-title\|)\n(=+)\n'
+    parts = re.split(pattern, content, maxsplit=1)
+    if len(parts) != 4:
+        print("error splitting news")
+        return
+    
+    header = parts[0]
+    content = parts[3]
+    
     # Remove existing latestNews directives
     content = re.sub(r'\.\. _LatestNewsStart:\n', '', content, flags=re.DOTALL)
     content = re.sub(r'\.\. _LatestNewsEnd:\n', '', content, flags=re.DOTALL)
 
-    old_news = content.split('   :caption: News')
-    
     # Insert the new section
-    new_section = f"{section_title}\n{'=' * len(section_title)}\n\n.. _LatestNewsStart\n\n{release_notes}\n_LatestNewsStart\n\n"
+    release_notes = re.sub(r':bug:', '|bug|',release_notes, flags=re.DOTALL)
+    release_notes = re.sub(r':rocket:', '|rocket|',release_notes, flags=re.DOTALL)
+    release_notes = re.sub(r':hammer_and_wrench:', '|hammer_and_wrench|',release_notes, flags=re.DOTALL)
+    new_section = f".. _LatestNewsStart:\n\n{release_notes}\n\n.. _LatestNewsEnd:"
 
-    content = f"{old_news[0]}   :caption: News\n\n{new_section}\n{old_news[1]}"
+    new_content = header
+
+    new_content += "\n"
+    new_content += ".. |bug| unicode:: U+1F41B\n"
+    new_content += "   :ltrim:\n"
+    new_content += "\n"
+    new_content += ".. |rocket| unicode:: U+1F680\n"
+    new_content += "   :ltrim:\n"
+    new_content += "\n"
+    new_content += ".. |hammer_and_wrench| unicode:: U+1F6E0\n"
+    new_content += "   :ltrim:\n"
+    new_content += "\n"
+
+    latest_news_title = f"**{date_str} - OpenEXR {tag} Released**"
+    
+    new_content += "|latest-news-title|\n"
+    new_content += '=' * len(latest_news_title) + '\n\n'
+    new_content += new_section
+    new_content += '\n'
+    new_content += '\n'
+    new_content += previous_news_title + '\n'
+    new_content += '=' * len(previous_news_title) + '\n'
+    new_content += content
     
     with open('website/news.rst', 'w') as f:
-        f.write(content)
+        f.write(new_content)
+
+    with open('website/latest_news_title.rst', 'w') as f:
+        f.write(f".. |latest-news-title| replace:: {latest_news_title}")
 
 def markdown_to_html(markdown_text):
     """
