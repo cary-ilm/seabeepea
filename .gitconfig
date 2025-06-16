@@ -1,0 +1,20 @@
+[user]
+	email = cary@ilm.com
+	name = Cary Phillips
+	signingkey = 8AA6076A6174AF64
+
+[core]
+	editor = emacs
+
+[credential "https://github.com"]
+	helper = !/home/cary/src/gh-cli/bin/gh auth git-credential
+
+[init]
+	defaultBranch = main
+
+[push]
+	autoSetupRemote = true
+[diff]
+	tool = meld
+[difftool]
+	prompt = false
