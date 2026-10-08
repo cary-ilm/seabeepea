@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) Contributors to the OpenEXR Project.
+#
+
+name: CI
+
+on:
+  push:
+    paths:
+      - '**'
+    tags:
+      - '**'
+  pull_request:
+    paths:
+      - '**'
+
+permissions:
+  contents: read
+
+#concurrency:
+#  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+#  cancel-in-progress: ${{ (github.head_ref || github.ref_name) != 'master' }}
+
+jobs:
+  linux:
+    name: Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step
+        run: |
+          echo "Run step"
